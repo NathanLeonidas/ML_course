@@ -1,6 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.decomposition import TruncatedSVD
+from sklearn.decomposition import TruncatedSVD, KernelPCA
+from sklearn.preprocessing import StandardScaler
+
+
 
 
 
@@ -76,13 +79,45 @@ X_centered = X - X_moy
 print(moy, np.shape(moy))
 print(X_centered[:,1])
 
+#PCA
 svd = TruncatedSVD(n_components=2, n_iter=10, random_state=5)
 U = svd.fit_transform(np.transpose(X_centered))
-Sigma = np.diag(svd.singular_values_)
-V = svd.components_
 
-
-print(U)
+print(svd.singular_values_)
 plt.scatter(U[:,0],U[:,1], c=labels)
+plt.title('principal components of 28*28 images')
 plt.savefig('pca_result.png')
 plt.close()
+
+
+svd3D = TruncatedSVD(n_components=3, n_iter=10, random_state=5)
+U = svd3D.fit_transform(np.transpose(X_centered))
+fig = plt.figure()
+ax = fig.add_subplot(projection='3d')
+ax.scatter(U[:,0],U[:,1],U[:,2], c=labels)
+plt.savefig('3D_pca_result')
+plt.close()
+
+
+#kernelPCA
+max_samples = 5000
+kpca = KernelPCA(n_components=9, kernel='rbf')
+data = np.transpose(X_centered[:,:max_samples])
+
+
+scaler = StandardScaler()
+X_std = scaler.fit_transform(data)
+print(np.shape(data), np.shape(X_std))
+
+U = kpca.fit_transform(X_std)
+print(np.shape(X_centered[:,:max_samples]), np.shape(U))
+
+plt.scatter(U[:,0],U[:,1], c=labels[:max_samples])
+plt.title('kernel principal components of 28*28 images')
+plt.savefig('k_pca_result.png')
+plt.close()
+print(kpca.eigenvalues_, np.sum(kpca.eigenvalues_), np.sum(kpca.eigenvalues_[:2]))
+
+
+
+
