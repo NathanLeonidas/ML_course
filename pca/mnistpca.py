@@ -101,7 +101,7 @@ plt.close()
 
 #kernelPCA
 max_samples = 5000
-kpca = KernelPCA(n_components=9, kernel='rbf')
+kpca = KernelPCA(n_components=9, kernel='cosine')
 data = np.transpose(X_centered[:,:max_samples])
 
 
