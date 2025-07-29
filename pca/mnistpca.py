@@ -52,8 +52,8 @@ def extract_labels(file_path):
         
         return labels
 
-pathi = './trainimages'
-pathl = './trainlabels'
+pathi = '/home/ross/Coding/ML_course/mnistdb/trainimages'
+pathl = '/home/ross/Coding/ML_course/mnistdb/trainlabels'
 images = extract_images(pathi)
 flat_img = flatten_images(images)
 labels = extract_labels(pathl)
