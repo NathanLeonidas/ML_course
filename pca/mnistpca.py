@@ -94,8 +94,10 @@ svd3D = TruncatedSVD(n_components=3, n_iter=10, random_state=5)
 U = svd3D.fit_transform(np.transpose(X_centered))
 fig = plt.figure()
 ax = fig.add_subplot(projection='3d')
-ax.scatter(U[:,0],U[:,1],U[:,2], c=labels)
+nm =500
+ax.scatter(U[:nm,0],U[:nm,1],U[:nm,2], c=labels[:nm])
 plt.savefig('3D_pca_result')
+plt.show()
 plt.close()
 
 
