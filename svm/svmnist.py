@@ -66,7 +66,7 @@ def plot_embedding(X, images, labels, ax):
     shown_images = np.array([[0.0,0.0]])
     for i in range(X.shape[0]):
         dist = np.sum((X[i] - shown_images)**2, 1)
-        if np.min(dist) < 5e-3:
+        if np.min(dist) < 5e-2:
             continue
         shown_images = np.concatenate([shown_images, [X[i]]], axis=0)
         imagebox = offsetbox.AnnotationBbox(
@@ -100,7 +100,7 @@ X_test_scaled = scaler.transform(test_flat_img)
 
 
 
-'''
+
 
 ##########################
 ## svm only approach
@@ -130,7 +130,7 @@ print('-'*20)
 
 
 
-'''
+
 #########################
 ## tsne then svm approach
 ##
@@ -148,7 +148,7 @@ print('-'*20)
 #########################
 
 
-svc = svm.SVC(kernel='rbf', decision_function_shape='ovo',C=1, gamma = 0.02)
+svc = svm.SVC(kernel='rbf', decision_function_shape='ovo',C=1000, gamma = 0.0002)
 embedder = TSNE(n_components=2, learning_rate='auto', init='random', perplexity=100)
 
 
@@ -205,7 +205,7 @@ print('-'*20)
 ## svm pca approach
 #######################
 
-svc = svm.SVC(kernel='rbf', decision_function_shape='ovo',C=0.001, gamma = 0.02)
+svc = svm.SVC(kernel='rbf', decision_function_shape='ovo',C=10000, gamma = 0.002)
 
 pca = PCA(n_components=2)
 X_train_pca_unprocessed = pca.fit_transform(X_train_scaled)
@@ -243,6 +243,7 @@ plt.show()
 print('-'*20)
 print('pca svm results \n')
 print(classification_report(test_labels, predicted))
+print('results are genuinely awful. from the plots it is easy to see that 2 dimensions of projections are not enough')
 print('-'*20)
 
 
@@ -284,6 +285,7 @@ plt.show()
 print('-'*20)
 print('kernel pca svm results \n')
 print(classification_report(test_labels, predicted))
+print('results are not much better with a kernel pca, we need to have more components of projection')
 print('-'*20)
 
 
@@ -324,6 +326,7 @@ plt.show()
 print('-'*20)
 print('pca svm results \n')
 print(classification_report(test_labels, predicted))
+print('already better. Indeed:')
 print('\nvariance of compontents:')
 print(pca.explained_variance_)
 print('\nthey each occupy this % of the variance')
@@ -364,5 +367,5 @@ plt.show()
 print('-'*20)
 print('kernel pca svm results \n')
 print(classification_report(test_labels, predicted))
-print('worse than linear kernel...')
+print('still worse than a simple svm with rbf kernel though...')
 print('-'*20)
