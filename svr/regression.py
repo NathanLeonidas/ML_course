@@ -11,7 +11,6 @@ from sklearn.model_selection import KFold
 
 path = '../kaggledb/train.csv'
 df = pd.read_csv(path)
-df.fillna(0)
 
 keys = df.keys()
 nondiscrete_keyvals = []
@@ -36,7 +35,7 @@ pca = PCA(n_components=2, svd_solver='full')
 X_pca_train = pca.fit_transform(X_std_train)
 X_pca_test = pca.transform(X_std_test)
 
-'''
+
 ############################
 ## example run
 ##
@@ -46,9 +45,10 @@ X_pca_test = pca.transform(X_std_test)
 ## are not meant to be 
 ## used for regression
 ## ie yes/no numbers
-## we slove that later
+## we'll slove that later
 ## with mutual information
 ############################
+
 svr = SVR(C=438269, epsilon=10571)
 svr.fit(X_pca_train,Y_train)
 
@@ -137,30 +137,39 @@ for j, (train_index, test_index) in enumerate(kf.split(X)):
 print(f'Mean best hyperparam : {np.mean(list_hyperparams, axis=0)}')
 
 
-'''
+
 ##########################
 ## kaggle test
 ##
 ## using k fold we found
 ## best hyperparams and
 ## now we shall test them
+## (the chosen values of
+## C and epsilon below)
+##
+## got 1.8 RMSE on kaggle
+## ~4k world leaderboard
+## frankly ok for such a
+## naive approach
 #########################
 
 
-svr = SVR(C=438269, epsilon=10571)
-svr.fit(X,Y)
 
 scaler = StandardScaler()
 scaler.fit(X)
 pca = PCA(n_components=2, svd_solver='full')
-pca.fit(X)
-
+X_full_pca = pca.fit_transform(X)
+svr = SVR(C=438269, epsilon=10571)
+svr.fit(X_full_pca,Y)
 
 path = '../kaggledb/test.csv'
 df = pd.read_csv(path)
-df.fillna(0)
-for i in list((df[3])):
-    print(i)
+print(df)
+
+for key in nondiscrete_keyvals:
+    for (i,value) in enumerate(df[key]):
+        if np.isnan(value):
+            df.loc[i,key]=0
 
 X_valid = np.array(df[nondiscrete_keyvals])
 
@@ -169,9 +178,17 @@ print(X.shape, X_valid.shape)
 X_std_valid = scaler.transform(X_valid)
 X_pca_valid = pca.transform(X_std_valid)
 
-prediction = svr.predict(X_pca)
+prediction = svr.predict(X_pca_valid)
 
-print(prediction)
+
+output_df = pd.DataFrame({'Id':range(1461,2920), 'SalePrice':prediction})
+print(output_df)
+output_df.to_csv('Prediction_simple_svr.csv', index=False)
+
+
+
+##TODO
 ##MUTUAL INFORMATION????
-
+##ENSEMBLE LEARNING
+##XGBOOST
 
